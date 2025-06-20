@@ -150,7 +150,6 @@ micro_erp/
    ```
 6. Acesse no navegador:
    - Em ambiente local: [http://localhost:5000](http://localhost:5000)
-   - **Após o deploy na nuvem:** use o link fornecido pela plataforma, por exemplo: [https://seu-projeto.up.railway.app](https://seu-projeto.up.railway.app)
    - **Link público do sistema:** [https://desafiomicroerp-production.up.railway.app/](https://desafiomicroerp-production.up.railway.app/)
 
 ---
@@ -203,18 +202,6 @@ micro_erp/
 - O objetivo é demonstrar lógica, organização, integração e domínio de conceitos de desenvolvimento web.
 - O código pode ser adaptado, melhorado e expandido conforme o desafio exigir.
 
----
-
-## 📚 Documentação Detalhada
-Para uma documentação mais completa e detalhada do projeto, incluindo:
-- Arquitetura detalhada
-- Fluxos de processos
-- Regras de negócio
-- Auxílio de IA no desenvolvimento
-- Convenções do projeto
-- E muito mais...
-
-Consulte o arquivo [`docs/DOCUMENTACAO.md`](docs/DOCUMENTACAO.md).
 
 ---
 
