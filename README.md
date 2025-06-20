@@ -151,6 +151,7 @@ micro_erp/
 6. Acesse no navegador:
    - Em ambiente local: [http://localhost:5000](http://localhost:5000)
    - **Após o deploy na nuvem:** use o link fornecido pela plataforma, por exemplo: [https://seu-projeto.up.railway.app](https://seu-projeto.up.railway.app)
+   - **Link público do sistema:** [https://desafiomicroerp-production.up.railway.app/](https://desafiomicroerp-production.up.railway.app/)
 
 ---
 
