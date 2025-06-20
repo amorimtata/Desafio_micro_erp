@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Nova NF-e{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{% if nfe %}Editar{% else %}Nova{% endif %} NF-e</h2>
+        <a href="{{ url_for('nfe_bp.listar_nfe') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="alert alert-info">Os dados do emitente são preenchidos automaticamente para ambiente de homologação.</div>
+
+    <form method="POST" id="formNFe" data-produtos='{{ produtos | tojson | safe }}'>
+        <div class="row">
+            <!-- Dados Básicos -->
+            <div class="col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Dados Básicos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="numero" class="form-label">Número</label>
+                                    <input type="text" class="form-control" id="numero" name="numero" value="{{ proximo_numero }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="serie" class="form-label">Série</label>
+                                    <input type="text" class="form-control" id="serie" name="serie" value="1" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="data_emissao" class="form-label">Data de Emissão</label>
+                                    <input type="date" class="form-control" id="data_emissao" name="data_emissao" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="natureza_operacao" class="form-label">Natureza da Operação</label>
+                                    <input type="text" class="form-control" id="natureza_operacao" name="natureza_operacao" value="Venda de Mercadoria" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Destinatário -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Destinatário</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="destinatario_cnpj" class="form-label">CNPJ</label>
+                            <input type="text" class="form-control" id="destinatario_cnpj" name="destinatario_cnpj" value="{{ nfe.destinatario_cnpj if nfe else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destinatario_razao_social" class="form-label">Razão Social</label>
+                            <input type="text" class="form-control" id="destinatario_razao_social" name="destinatario_razao_social" value="{{ nfe.destinatario_razao_social if nfe else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destinatario_ie" class="form-label">Inscrição Estadual</label>
+                            <input type="text" class="form-control" id="destinatario_ie" name="destinatario_ie" value="{{ nfe.destinatario_ie if nfe else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destinatario_endereco" class="form-label">Endereço</label>
+                            <input type="text" class="form-control" id="destinatario_endereco" name="destinatario_endereco" value="{{ nfe.destinatario_endereco if nfe else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destinatario_numero" class="form-label">Número</label>
+                            <input type="text" class="form-control" id="destinatario_numero" name="destinatario_numero" value="{{ nfe.destinatario_numero if nfe else '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destinatario_bairro" class="form-label">Bairro</label>
+                            <input type="text" class="form-control" id="destinatario_bairro" name="destinatario_bairro" value="{{ nfe.destinatario_bairro if nfe else '' }}" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="destinatario_cidade" class="form-label">Cidade</label>
+                                    <input type="text" class="form-control" id="destinatario_cidade" name="destinatario_cidade" value="{{ nfe.destinatario_cidade if nfe else '' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="destinatario_uf" class="form-label">UF</label>
+                                    <input type="text" class="form-control" id="destinatario_uf" name="destinatario_uf" value="{{ nfe.destinatario_uf if nfe else '' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="destinatario_cep" class="form-label">CEP</label>
+                                    <input type="text" class="form-control" id="destinatario_cep" name="destinatario_cep" value="{{ nfe.destinatario_cep if nfe else '' }}" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Itens da NF-e -->
+            <div class="col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Itens da NF-e</h5>
+                        <button type="button" class="btn btn-primary btn-sm" id="btnAdicionarItem" onclick="adicionarItem()">
+                            <i class="fas fa-plus"></i> Adicionar Item
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="tabelaItens">
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th>Quantidade</th>
+                                        <th>Valor Unitário</th>
+                                        <th>ICMS</th>
+                                        <th>Valor Total</th>
+                                        <th>NCM</th>
+                                        <th>CFOP</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if nfe and nfe.itens %}
+                                    {% for item in nfe.itens %}
+                                    <tr>
+                                        <td>
+                                            <select class="form-select" name="produto_id[]" required>
+                                                <option value="">Selecione...</option>
+                                                {% for produto in produtos %}
+                                                <option value="{{ produto.id }}" {% if item.produto_id == produto.id %}selected{% endif %}>
+                                                    {{ produto.nome }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control quantidade" name="quantidade[]" value="{{ item.quantidade }}" required min="1" onchange="atualizarValores()">
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control valor-unitario" name="valor_unitario[]" value="{{ item.valor_unitario }}" required min="0" step="0.01" onchange="atualizarValores()">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control icms-por-dentro" value="" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control valor-total" value="{{ item.valor_total }}" readonly>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="ncm[]" value="{{ item.ncm }}" required>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="cfop[]" value="{{ item.cfop }}" required>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="removerItem(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                        <td colspan="4"><strong id="valorTotal">R$ 0,00</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end mb-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Salvar
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Define a data de hoje como padrão
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('data_emissao').value = today;
+});
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/nfe_nova.js') }}"></script>
+{% endblock %} 

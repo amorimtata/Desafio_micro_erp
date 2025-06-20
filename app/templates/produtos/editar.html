@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Produto{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>Editar Produto</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="POST">
+            <div class="mb-3">
+                <label for="codigo" class="form-label">Código</label>
+                <input type="text" class="form-control" id="codigo" name="codigo" value="{{ produto.codigo }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="nome" name="nome" value="{{ produto.nome }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição</label>
+                <textarea class="form-control" id="descricao" name="descricao" rows="3">{{ produto.descricao }}</textarea>
+            </div>
+            
+            <div class="mb-3">
+                <label for="preco_unitario" class="form-label">Preço Unitário</label>
+                <input type="text" class="form-control" id="preco_unitario" name="preco_unitario" value="{{ "%.2f"|format(produto.preco_unitario)|replace('.', ',') }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="ncm" class="form-label">NCM</label>
+                <input type="text" class="form-control" id="ncm" name="ncm" value="{{ produto.ncm }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="cfop" class="form-label">CFOP</label>
+                <input type="text" class="form-control" id="cfop" name="cfop" value="{{ produto.cfop }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="unidade" class="form-label">Unidade</label>
+                <input type="text" class="form-control" id="unidade" name="unidade" value="{{ produto.unidade }}" required>
+            </div>
+            
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a href="{{ url_for('produto_bp.listar_produtos') }}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/produtos.js') }}"></script>
+{% endblock %} 

@@ -1,0 +1,281 @@
+{# Template para gerenciamento de estoque - Exibe entradas, saídas e histórico de movimentações #}
+{% extends "base.html" %}
+
+{% block title %}Gestão de Estoque{% endblock %}
+
+{% block head %}
+{# CSS específico para modais e componentes de estoque #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Gestão de Estoque</h2>
+    
+    {# Sistema de abas para navegação entre entradas, saídas e histórico #}
+    <ul class="nav nav-tabs" id="estoqueTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="entradas-tab" data-bs-toggle="tab" data-bs-target="#entradas" type="button" role="tab">
+                Entradas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="saidas-tab" data-bs-toggle="tab" data-bs-target="#saidas" type="button" role="tab">
+                Saídas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button" role="tab">
+                Histórico
+            </button>
+        </li>
+    </ul>
+
+    {# Conteúdo das abas #}
+    <div class="tab-content" id="estoqueTabContent">
+        {# Aba de Entradas - Lista e gerencia entradas de estoque #}
+        <div class="tab-pane fade show active" id="entradas" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                <h4>Entradas de Estoque</h4>
+                <button class="btn btn-primary d-none" id="btnNovaEntrada" data-bs-toggle="modal" data-bs-target="#modalNovaEntrada">
+                    <i class="fas fa-plus"></i> Nova Entrada
+                </button>
+            </div>
+            <div class="row mb-2 align-items-end">
+                <div class="col-md-3">
+                    <label for="filtroEntradaDataInicial" class="form-label fw-bold">Data Inicial</label>
+                    <input type="date" class="form-control" id="filtroEntradaDataInicial" placeholder="Data Inicial">
+                </div>
+                <div class="col-md-3">
+                    <label for="filtroEntradaDataFinal" class="form-label fw-bold">Data Final</label>
+                    <input type="date" class="form-control" id="filtroEntradaDataFinal" placeholder="Data Final">
+                </div>
+                <div class="col-md-3">
+                    <label for="filtroEntradaNotaFiscal" class="form-label fw-bold">Nota Fiscal</label>
+                    <input type="text" class="form-control" id="filtroEntradaNotaFiscal" placeholder="Nota Fiscal">
+                </div>
+                <div class="col-md-2">
+                    <label for="filtroEntradaProduto" class="form-label fw-bold">Produto</label>
+                    <select class="form-select" id="filtroEntradaProduto">
+                        <option value="">Todos os Produtos</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn-success w-100" id="btnFiltrarEntradas">Filtrar</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" id="tabelaEntradas">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Nota Fiscal</th>
+                            <th>Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados carregados via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# Aba de Saídas - Lista e gerencia saídas de estoque #}
+        <div class="tab-pane fade" id="saidas" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                <h4>Saídas de Estoque</h4>
+                <button class="btn btn-danger d-none" id="btnNovaSaida" data-bs-toggle="modal" data-bs-target="#modalNovaSaida">
+                    <i class="fas fa-minus"></i> Nova Saída
+                </button>
+            </div>
+            <div class="row mb-2 align-items-end">
+                <div class="col-md-3">
+                    <label for="filtroSaidaDataInicial" class="form-label fw-bold">Data Inicial</label>
+                    <input type="date" class="form-control" id="filtroSaidaDataInicial" placeholder="Data Inicial">
+                </div>
+                <div class="col-md-3">
+                    <label for="filtroSaidaDataFinal" class="form-label fw-bold">Data Final</label>
+                    <input type="date" class="form-control" id="filtroSaidaDataFinal" placeholder="Data Final">
+                </div>
+                <div class="col-md-3">
+                    <label for="filtroSaidaNotaFiscal" class="form-label fw-bold">Nota Fiscal</label>
+                    <input type="text" class="form-control" id="filtroSaidaNotaFiscal" placeholder="Nota Fiscal">
+                </div>
+                <div class="col-md-2">
+                    <label for="filtroSaidaProduto" class="form-label fw-bold">Produto</label>
+                    <select class="form-select" id="filtroSaidaProduto">
+                        <option value="">Todos os Produtos</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn-success w-100" id="btnFiltrarSaidas">Filtrar</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" id="tabelaSaidas">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Nota Fiscal</th>
+                            <th>Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados carregados via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# Aba de Histórico - Exibe todas as movimentações #}
+        <div class="tab-pane fade" id="historico" role="tabpanel">
+            <div class="mt-3 mb-3">
+                <h4>Histórico de Movimentações</h4>
+            </div>
+            <div class="row mb-2 align-items-end">
+                <div class="col-md-3">
+                    <label for="filtroHistoricoDataInicial" class="form-label fw-bold">Data Inicial</label>
+                    <input type="date" class="form-control" id="filtroHistoricoDataInicial" placeholder="Data Inicial">
+                </div>
+                <div class="col-md-3">
+                    <label for="filtroHistoricoDataFinal" class="form-label fw-bold">Data Final</label>
+                    <input type="date" class="form-control" id="filtroHistoricoDataFinal" placeholder="Data Final">
+                </div>
+                <div class="col-md-3">
+                    <label for="filtroHistoricoNotaFiscal" class="form-label fw-bold">Nota Fiscal</label>
+                    <input type="text" class="form-control" id="filtroHistoricoNotaFiscal" placeholder="Nota Fiscal">
+                </div>
+                <div class="col-md-2">
+                    <label for="filtroHistoricoProduto" class="form-label fw-bold">Produto</label>
+                    <select class="form-select" id="filtroHistoricoProduto">
+                        <option value="">Todos os Produtos</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn-success w-100" id="btnFiltrarHistorico">Filtrar</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" id="tabelaHistorico">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Tipo</th>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Nota Fiscal</th>
+                            <th>Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados carregados via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal para registrar nova entrada de estoque #}
+<div class="modal fade" id="modalNovaEntrada" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nova Entrada de Estoque</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovaEntrada">
+                    <div class="mb-3">
+                        <label for="produto" class="form-label">Produto *</label>
+                        <select class="form-select" id="produto" name="produto_codigo" required>
+                            <option value="">Selecione um produto</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantidade" class="form-label">Quantidade *</label>
+                        <input type="number" class="form-control" id="quantidade" name="quantidade" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nota_fiscal" class="form-label">Nota Fiscal</label>
+                        <input type="text" class="form-control" id="nota_fiscal" name="nota_fiscal">
+                    </div>
+                    <div class="mb-3">
+                        <label for="observacao" class="form-label">Observação</label>
+                        <textarea class="form-control" id="observacao" name="observacao" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnSalvarEntrada">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal para registrar nova saída de estoque #}
+<div class="modal fade" id="modalNovaSaida" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nova Saída de Estoque</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovaSaida">
+                    <div class="mb-3">
+                        <label for="produto_saida" class="form-label">Produto *</label>
+                        <select class="form-select" id="produto_saida" name="produto_codigo" required>
+                            <option value="">Selecione um produto</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantidade_saida" class="form-label">Quantidade *</label>
+                        <input type="number" class="form-control" id="quantidade_saida" name="quantidade" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nota_fiscal_saida" class="form-label">Nota Fiscal</label>
+                        <input type="text" class="form-control" id="nota_fiscal_saida" name="nota_fiscal">
+                    </div>
+                    <div class="mb-3">
+                        <label for="observacao_saida" class="form-label">Observação</label>
+                        <textarea class="form-control" id="observacao_saida" name="observacao" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnSalvarSaida">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal de feedback de sucesso #}
+<div class="modal fade" id="modalSucesso" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="checkmark-circle mb-3">
+                    <div class="background"></div>
+                    <div class="checkmark draw"></div>
+                </div>
+                <h4 class="mb-3">Sucesso!</h4>
+                <p class="mb-4">Entrada registrada com sucesso!</p>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{# Scripts necessários para o funcionamento do módulo de estoque #}
+<script src="{{ url_for('static', filename='js/estoque.js') }}"></script>
+<script src="{{ url_for('static', filename='js/estoque/modals.js') }}"></script>
+{% endblock %} 

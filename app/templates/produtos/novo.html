@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Produto{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>Novo Produto</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <form id="formNovoProduto" method="POST">
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome</label>
+                <input type="text" class="form-control" id="nome" name="nome" required>
+            </div>
+            <div class="mb-3">
+                <label for="codigo" class="form-label">Código</label>
+                <input type="text" class="form-control" id="codigo" name="codigo" required readonly>
+            </div>
+            
+            <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição</label>
+                <textarea class="form-control" id="descricao" name="descricao" rows="3"></textarea>
+            </div>
+            
+            <div class="mb-3">
+                <label for="preco_unitario" class="form-label">Preço Unitário</label>
+                <input type="text" class="form-control" id="preco_unitario" name="preco_unitario" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="ncm" class="form-label">NCM</label>
+                <input type="text" class="form-control" id="ncm" name="ncm" value="00000000" required>
+            </div>
+            <div class="mb-3">
+                <label for="cfop" class="form-label">CFOP</label>
+                <input type="text" class="form-control" id="cfop" name="cfop" value="5102" required>
+            </div>
+            <div class="mb-3">
+                <label for="unidade" class="form-label">Unidade</label>
+                <input type="text" class="form-control" id="unidade" name="unidade" value="un" required>
+            </div>
+            
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a href="{{ url_for('produto_bp.listar_produtos') }}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nomeInput = document.getElementById('nome');
+    const codigoInput = document.getElementById('codigo');
+    const form = document.getElementById('formNovoProduto');
+
+    // Geração do código
+    if (nomeInput && codigoInput) {
+        nomeInput.addEventListener('input', function() {
+            let nome = nomeInput.value.trim();
+            if (nome.length === 0) {
+                codigoInput.value = '';
+                return;
+            }
+            let slug = nome.normalize('NFD').replace(/[^\w\s]/g, '').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '').toUpperCase();
+            slug = slug.substring(0, 4);
+            codigoInput.value = slug + '001';
+        });
+    }
+});
+</script>
+<script src="{{ url_for('static', filename='js/produtos.js') }}"></script>
+{% endblock %} 

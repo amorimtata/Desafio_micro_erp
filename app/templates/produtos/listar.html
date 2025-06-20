@@ -1,0 +1,88 @@
+{# 
+  Template de listagem de produtos
+  Exibe uma tabela com todos os produtos cadastrados e suas informações principais.
+  Permite acesso às ações de edição e exclusão.
+#}
+
+{% extends "base.html" %}
+
+{% block title %}Produtos{% endblock %}
+
+{% block head %}
+{# Importação do CSS específico para modais #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {# Cabeçalho com título e botão de novo produto #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Produtos</h2>
+        <a href="{{ url_for('produto_bp.novo_produto') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Novo Produto
+        </a>
+    </div>
+
+    {# Tabela de produtos #}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th>Preço Unitário</th>
+                    <th>Unidade</th>
+                    <th>Saldo em Estoque</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produto in produtos %}
+                <tr>
+                    <td>{{ produto.codigo }}</td>
+                    <td>{{ produto.nome }}</td>
+                    <td>R$ {{ '%.2f'|format(produto.preco_unitario) }}</td>
+                    <td>{{ produto.unidade }}</td>
+                    <td>{{ produto.saldo_estoque }}</td>
+                    <td>
+                        {# Botões de ação #}
+                        <a href="{{ url_for('produto_bp.editar_produto', id=produto.id) }}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmarExclusao('{{ url_for('produto_bp.excluir', id=produto.id) }}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# Modal de confirmação de exclusão #}
+<div class="modal fade" id="modalExclusao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir este produto?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExclusao" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{# Scripts necessários para manipulação de produtos #}
+<script src="{{ url_for('static', filename='js/produtos/modals.js') }}"></script>
+{% endblock %} 

@@ -1,0 +1,103 @@
+/* Estilo para o checkmark animado */
+.checkmark-circle {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.checkmark-circle .background {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #28a745;
+    position: absolute;
+}
+
+.checkmark-circle .checkmark {
+    border-radius: 5px;
+}
+
+.checkmark-circle .checkmark.draw:after {
+    content: "";
+    width: 25px;
+    height: 12.5px;
+    position: absolute;
+    border-left: 4px solid #fff;
+    border-bottom: 4px solid #fff;
+    left: 12.5px;
+    top: 16px;
+    transform: rotate(-45deg);
+}
+
+/* Estilo para o ícone de alerta no modal de exclusão */
+.warning-icon {
+    font-size: 3rem;
+    color: #ffc107;
+    animation: warning-bounce 0.5s ease-in-out;
+    display: block;
+    margin: 20px auto;
+}
+
+.modal .confirmation-text {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+@keyframes warning-bounce {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Espaçamento entre botões de ação */
+.btn-group .btn:not(:last-child),
+.btn-group form:not(:last-child),
+.btn-group form:not(:last-child) .btn {
+    margin-right: 5px;
+}
+
+/* Ajuste para formulários inline */
+.d-inline {
+    margin-right: 5px;
+}
+
+/* Padronização dos botões de ação */
+.btn-group .btn-sm {
+    margin-right: 5px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Padronização dos ícones */
+.btn-group .btn-sm i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* Remove a margem do último botão */
+.btn-group .btn-sm:last-child {
+    margin-right: 0;
+}
+
+/* Garante que os forms inline não afetem o alinhamento */
+.btn-group form.d-inline {
+    margin: 0;
+    padding: 0;
+    display: inline-flex !important;
+} 

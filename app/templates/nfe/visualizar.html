@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Visualizar NF-e{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col">
+            <h2>Nota Fiscal Eletrônica #{{ nfe.numero }}</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Informações Gerais</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Série:</strong> {{ nfe.serie }}</p>
+                            <p><strong>Data de Emissão:</strong> {{ nfe.data_emissao.strftime('%d/%m/%Y %H:%M') }}</p>
+                            <p><strong>Status:</strong> 
+                                {% if nfe.status == 'autorizada' %}
+                                    <span class="badge bg-success">Autorizada</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Pendente</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            {% if nfe.protocolo %}
+                            <p><strong>Protocolo:</strong> {{ nfe.protocolo }}</p>
+                            <p><strong>Chave de Acesso:</strong> {{ nfe.chave }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Emitente</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Razão Social:</strong> {{ nfe.emitente_razao_social }}</p>
+                    <p><strong>CNPJ:</strong> {{ nfe.emitente_cnpj }}</p>
+                    <p><strong>IE:</strong> {{ nfe.emitente_ie }}</p>
+                    <p><strong>Endereço:</strong> {{ nfe.emitente_endereco }}, {{ nfe.emitente_numero }}</p>
+                    <p><strong>Bairro:</strong> {{ nfe.emitente_bairro }}</p>
+                    <p><strong>Cidade/UF:</strong> {{ nfe.emitente_cidade }}/{{ nfe.emitente_uf }}</p>
+                    <p><strong>CEP:</strong> {{ nfe.emitente_cep }}</p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Destinatário</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Razão Social:</strong> {{ nfe.destinatario_razao_social }}</p>
+                    <p><strong>CNPJ:</strong> {{ nfe.destinatario_cnpj }}</p>
+                    <p><strong>IE:</strong> {{ nfe.destinatario_ie }}</p>
+                    <p><strong>Endereço:</strong> {{ nfe.destinatario_endereco }}, {{ nfe.destinatario_numero }}</p>
+                    <p><strong>Bairro:</strong> {{ nfe.destinatario_bairro }}</p>
+                    <p><strong>Cidade/UF:</strong> {{ nfe.destinatario_cidade }}/{{ nfe.destinatario_uf }}</p>
+                    <p><strong>CEP:</strong> {{ nfe.destinatario_cep }}</p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Itens</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Produto</th>
+                                    <th>NCM</th>
+                                    <th>CFOP</th>
+                                    <th>Qtd</th>
+                                    <th>Vl. Unit.</th>
+                                    <th>Vl. Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in itens_com_icms %}
+                                <tr>
+                                    <td>{{ item.codigo }}</td>
+                                    <td>{{ item.nome }}</td>
+                                    <td>{{ item.ncm }}</td>
+                                    <td>{{ item.cfop }}</td>
+                                    <td>{{ '%.2f'|format(item.quantidade) }}</td>
+                                    <td>R$ {{ '%.2f'|format(item.valor_unitario_icms) }}</td>
+                                    <td>R$ {{ '%.2f'|format(item.valor_total_icms) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6" class="text-end"><strong>Total:</strong></td>
+                                    <td><strong>R$ {{ '%.2f'|format(total_com_icms) }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Documentos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group">
+                        {% if nfe.xml_path %}
+                        <a href="{{ url_for('nfe_bp.baixar_xml', id=nfe.id) }}" class="btn btn-primary">
+                            <i class="fas fa-file-code"></i> Download XML
+                        </a>
+                        {% endif %}
+                        
+                        {% if nfe.pdf_path %}
+                        <a href="{{ url_for('nfe.download_pdf', id=nfe.id) }}" class="btn btn-danger">
+                            <i class="fas fa-file-pdf"></i> Download PDF
+                        </a>
+                        {% endif %}
+                        
+                        {% if nfe.protocolo_path %}
+                        <a href="{{ url_for('nfe.download_protocolo', id=nfe.id) }}" class="btn btn-info">
+                            <i class="fas fa-file-alt"></i> Download Protocolo
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-end">
+                <a href="{{ url_for('nfe_bp.listar_nfe') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

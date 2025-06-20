@@ -1,0 +1,185 @@
+{# Template de listagem de notas fiscais - Exibe e gerencia todas as NF-e do sistema #}
+{% extends "base.html" %}
+
+{% block title %}Notas Fiscais{% endblock %}
+
+{% block head %}
+{# CSS específico para modais e componentes de NF-e #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/modals.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Notas Fiscais Eletrônicas</h2>
+        <a href="{{ url_for('nfe_bp.nova_nfe') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nova NF-e
+        </a>
+    </div>
+
+    {# Sistema de mensagens flash para feedback ao usuário #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {# Lista de notas fiscais #}
+    {% if nfes %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Série</th>
+                            <th>Data Emissão</th>
+                            <th>Destinatário</th>
+                            <th>Valor Total</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for nfe in nfes %}
+                        <tr>
+                            <td>{{ nfe.numero }}</td>
+                            <td>{{ nfe.serie }}</td>
+                            <td>{{ nfe.data_emissao.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>{{ nfe.destinatario_razao_social }}</td>
+                            <td>R$ {{ '%.2f'|format(nfe.valor_total_icms) }}</td>
+                            <td>
+                                {# Badges de status com cores diferentes #}
+                                {% if nfe.status == 'rascunho' %}
+                                    <span class="badge bg-warning">Rascunho</span>
+                                {% elif nfe.status == 'emitida' %}
+                                    <span class="badge bg-success">Emitida</span>
+                                {% elif nfe.status == 'autorizada' %}
+                                    <span class="badge bg-success">Autorizada</span>
+                                {% elif nfe.status == 'cancelada' %}
+                                    <span class="badge bg-danger">Cancelada</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {# Botões de ação com base no status da NF-e #}
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('nfe_bp.visualizar_nfe', id=nfe.id) }}" class="btn btn-info btn-sm" title="Visualizar">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if nfe.status == 'rascunho' %}
+                                        <a href="{{ url_for('nfe_bp.editar_nfe', id=nfe.id) }}" class="btn btn-warning btn-sm" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ url_for('nfe_bp.emitir_nfe', id=nfe.id) }}" method="POST" class="d-inline">
+                                            <button type="button" class="btn btn-success btn-sm" title="Emitir NF-e" onclick="confirmarEmissao('{{ url_for('nfe_bp.emitir_nfe', id=nfe.id) }}')">
+                                                <i class="fas fa-file-invoice"></i>
+                                            </button>
+                                        </form>
+                                        <button type="button" class="btn btn-danger btn-sm" title="Excluir" onclick="confirmarExclusao('{{ url_for('nfe_bp.excluir_nfe', id=nfe.id) }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    {% endif %}
+                                    {% if (nfe.status == 'emitida' or nfe.status == 'autorizada') %}
+                                        {% if nfe.xml_path %}
+                                            <a href="{{ url_for('nfe_bp.baixar_xml', id=nfe.id) }}" class="btn btn-primary btn-sm" title="Baixar XML">
+                                                <i class="fas fa-file-code"></i>
+                                            </a>
+                                            <a href="{{ url_for('nfe_bp.baixar_pdf', id=nfe.id) }}" class="btn btn-danger btn-sm" title="Baixar PDF">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                        {% endif %}
+                                        {% if nfe.status == 'autorizada' %}
+                                            <button type="button" class="btn btn-danger btn-sm" title="Cancelar NF-e" onclick="confirmarCancelamento('{{ url_for('nfe_bp.cancelar_nfe', id=nfe.id) }}')">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Nenhuma NF-e encontrada.
+    </div>
+    {% endif %}
+</div>
+
+{# Modal de confirmação de exclusão #}
+<div class="modal fade" id="modalExclusao" tabindex="-1" aria-labelledby="modalExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalExclusaoLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja excluir esta NF-e?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExclusao" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal de confirmação de cancelamento #}
+<div class="modal fade" id="modalCancelamento" tabindex="-1" aria-labelledby="modalCancelamentoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCancelamentoLabel">Confirmar Cancelamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja cancelar esta NF-e?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formCancelamento" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Cancelar NF-e</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal de confirmação de emissão #}
+<div class="modal fade" id="modalEmissao" tabindex="-1" aria-labelledby="modalEmissaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEmissaoLabel">Confirmar Emissão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                Tem certeza que deseja emitir esta NF-e?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEmissaoModal" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-success">OK</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{# Scripts necessários para manipulação de NF-e #}
+<script src="{{ url_for('static', filename='js/nfe/listar.js') }}"></script>
+<script src="{{ url_for('static', filename='js/nfe/modals.js') }}"></script>
+{% endblock %} 

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Início{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Bem-vindo ao Micro ERP</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 d-flex flex-column justify-content-between">
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">
+                    <i class="bi bi-box-seam"></i>
+                    Gestão de Produtos
+                </h5>
+                <p class="card-text">Gerencie seu catálogo de produtos, preços e descrições.</p>
+                <div class="mt-auto">
+                    <a href="{{ url_for('produto_bp.listar_produtos') }}" class="btn btn-primary d-block mx-auto">Acessar Produtos</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 d-flex flex-column justify-content-between">
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">
+                    <i class="bi bi-archive"></i>
+                    Controle de Estoque
+                </h5>
+                <p class="card-text">Acompanhe entradas e saídas de produtos no estoque.</p>
+                <div class="mt-auto">
+                    <a href="{{ url_for('estoque_bp.gestao_estoque') }}" class="btn btn-primary d-block mx-auto">Acessar Estoque</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 d-flex flex-column justify-content-between">
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">
+                    <i class="bi bi-receipt"></i>
+                    Notas Fiscais
+                </h5>
+                <p class="card-text">Emita e gerencie notas fiscais eletrônicas.</p>
+                <div class="mt-auto">
+                    <a href="{{ url_for('nfe_bp.listar_nfe') }}" class="btn btn-primary d-block mx-auto">Acessar NF-e</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
