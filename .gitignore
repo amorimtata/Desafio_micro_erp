@@ -1,0 +1,7 @@
+pdf/
+xml/
+nfe_simulada/
+instance/
+*.db
+*.pyc
+__pycache__/ 
