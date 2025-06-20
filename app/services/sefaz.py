@@ -37,17 +37,8 @@ def validar_xml(xml_string):
             datetime.strptime(dh_emi.text, '%Y-%m-%dT%H:%M:%S-03:00')
         except ValueError:
             return False, "Formato de data inválido na tag ide/dhEmi"
-            
-        # Validar valores dos produtos
-        for det in root.findall('.//nfe:det', ns):
-            v_prod = det.find('.//nfe:vProd', ns)
-            if v_prod is None or not v_prod.text:
-                return False, "Tag vProd não encontrada em algum item"
-            try:
-                float(v_prod.text)
-            except ValueError:
-                return False, "Valor do produto inválido"
-                
+        
+        # Não validar mais valores dos produtos
         logger.info('XML validado com sucesso!')
         return True, "XML válido"
         
@@ -65,16 +56,16 @@ def enviar_nfe(xml_nfe):
         if not valido:
             return False, mensagem, None
         
-        # Nova validação: rejeitar data de emissão anterior ao dia atual
+        # Nova validação: rejeitar data de emissão anterior ao dia atual ou posterior
         root = ET.fromstring(xml_nfe)
         ns = {'nfe': 'http://www.portalfiscal.inf.br/nfe'}
         dh_emi = root.find('.//nfe:ide/nfe:dhEmi', ns)
         if dh_emi is not None and dh_emi.text:
             data_emissao = datetime.strptime(dh_emi.text[:10], '%Y-%m-%d').date()
             hoje = datetime.now().date()
-            if data_emissao < hoje:
-                logger.error('NF-e rejeitada: Data de emissão anterior ao permitido')
-                return False, 'Data de emissão anterior ao permitido', None
+            if data_emissao < hoje or data_emissao > hoje:
+                logger.error('NF-e rejeitada: Data de emissão inválida (apenas hoje permitido)')
+                return False, 'NF-e rejeitada: Data de emissão inválida (apenas hoje permitido)', None
         
         # Simular autorização (80% de chance de sucesso)
         if random.random() < 0.8:
@@ -99,14 +90,9 @@ def enviar_nfe(xml_nfe):
                 'chave': infProt.find('chNFe').text
             }
         else:
-            # Simular rejeição (sem valor total ou data)
-            codigos_erro = ['114']
-            mensagens_erro = [
-                "Valor do produto inválido"
-            ]
-            erro = random.choice(list(zip(codigos_erro, mensagens_erro)))
-            logger.error(f'NF-e rejeitada: {erro[1]}')
-            return False, f"NF-e rejeitada: {erro[1]}", None
+            # Simular rejeição genérica
+            logger.error('NF-e rejeitada: Erro genérico')
+            return False, 'NF-e rejeitada: Erro genérico', None
     except Exception as e:
         logger.error(f'Erro ao enviar NF-e: {str(e)}')
         return False, f"Erro ao enviar NF-e: {str(e)}", None 
