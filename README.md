@@ -14,6 +14,9 @@ Desenvolver um Micro ERP funcional para gestão de estoque e emissão simulada d
 O Micro ERP é um sistema web completo, com as seguintes funcionalidades já implementadas e funcionando:
 
 ### 1. Cadastro e Gestão de Produtos
+
+![Produtos](app/static/img/produtos.png)
+
 - Inclusão, edição e exclusão de produtos
 - Cada produto possui: código, nome, descrição, preço unitário, NCM, CFOP, unidade, quantidade mínima
 - Máscaras e validações para campos fiscais (NCM, CFOP)
@@ -23,6 +26,9 @@ O Micro ERP é um sistema web completo, com as seguintes funcionalidades já imp
 - Feedback visual aprimorado para ações importantes
 
 ### 2. Gestão de Estoque
+
+![Gestão Estoque](app/static/img/gestao_estoque.png)
+
 - **Entradas de estoque:**
   - Registro manual de entradas (compra, ajuste, etc.)
   - Seleção do produto, quantidade, nota fiscal e observação
@@ -39,6 +45,9 @@ O Micro ERP é um sistema web completo, com as seguintes funcionalidades já imp
   - Saldo de estoque sempre atualizado e calculado pelas movimentações
 
 ### 3. Notas Fiscais Eletrônicas (NF-e)
+
+![Nota Fiscal](app/static/img/nota_fiscal.png)
+
 - **Emissão de NF-e (simulada):**
   - Geração automática do próximo número
   - Cadastro de destinatário, itens, valores, NCM, CFOP
